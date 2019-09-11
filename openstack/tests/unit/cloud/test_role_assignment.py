@@ -976,7 +976,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -1007,7 +1011,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -1038,7 +1046,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -1069,7 +1081,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -1121,7 +1137,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -1150,7 +1170,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -1179,7 +1203,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -1208,7 +1236,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -2110,8 +2142,12 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
                  status_code=200,
+                 complete_qs=True,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
                  uri=self.get_mock_url(
@@ -2133,7 +2169,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -2156,7 +2196,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -2179,7 +2223,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -2223,7 +2271,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -2259,7 +2311,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -2295,7 +2351,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
@@ -2331,7 +2391,11 @@ class TestRoleAssignment(base.TestCase):
                  status_code=200,
                  json=self.domain_data.json_response),
             dict(method='GET',
-                 uri=self.get_mock_url(resource='groups'),
+                 uri=self.get_mock_url(resource='groups',
+                                       qs_elements=['domain_id=%s' %
+                                                    self.domain_data.
+                                                    domain_id]),
+                 complete_qs=True,
                  status_code=200,
                  json={'groups': [self.group_data.json_response['group']]}),
             dict(method='GET',
