@@ -125,3 +125,45 @@ class TestVolumeBackups(base.TestCase):
         ])
         self.cloud.delete_volume_backup(backup_id, True, True, 1)
         self.assert_calls()
+
+    def test_restore_volume_backup_name(self):
+        volume_name = 'restore_volume'
+        volume = {'name': volume_name}
+        backup_id = '6ff16bdf-44d5-4bf9-b0f3-687549c76414'
+        backup = {'id': backup_id}
+        self.register_uris([
+            dict(method='GET',
+                 uri=self.get_mock_url(
+                     'volumev2', 'public',
+                     append=['backups', 'detail']),
+                 json={"backups": [backup]}),
+            dict(method='POST',
+                 uri=self.get_mock_url(
+                     'volumev2', 'public',
+                     append=['backups', backup_id, 'restore']),
+                 json=dict(restore=volume),
+                 validate=dict(json=dict(restore=volume))),
+        ])
+        self.cloud.restore_volume_backup(backup_id, volume_name=volume_name)
+        self.assert_calls()
+
+    def test_restore_volume_backup_id(self):
+        volume_id = '04fb9623-a9a9-4f7d-905e-bcf191cfabe6'
+        volume = {'volume_id': volume_id}
+        backup_id = '6ff16bdf-44d5-4bf9-b0f3-687549c76414'
+        backup = {'id': backup_id}
+        self.register_uris([
+            dict(method='GET',
+                 uri=self.get_mock_url(
+                     'volumev2', 'public',
+                     append=['backups', 'detail']),
+                 json={"backups": [backup]}),
+            dict(method='POST',
+                 uri=self.get_mock_url(
+                     'volumev2', 'public',
+                     append=['backups', backup_id, 'restore']),
+                 json=dict(restore=volume),
+                 validate=dict(json=dict(restore=volume))),
+        ])
+        self.cloud.restore_volume_backup(backup_id, volume_id=volume_id)
+        self.assert_calls()

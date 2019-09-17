@@ -25,13 +25,14 @@ class TestVolume(base.BaseFunctionalTest):
         if not self.user_cloud.has_service('object-store'):
             self.skipTest('volume backups require swift')
 
-    def test_create_get_delete_volume_backup(self):
+    def test_create_get_restore_delete_volume_backup(self):
         volume = self.user_cloud.create_volume(
             display_name=self.getUniqueString(), size=1)
         self.addCleanup(self.user_cloud.delete_volume, volume['id'])
 
         backup_name_1 = self.getUniqueString()
         backup_desc_1 = self.getUniqueString()
+        restore_volume_name_1 = self.getUniqueString()
         backup = self.user_cloud.create_volume_backup(
             volume_id=volume['id'], name=backup_name_1,
             description=backup_desc_1, wait=True)
@@ -41,7 +42,25 @@ class TestVolume(base.BaseFunctionalTest):
         self.assertEqual("available", backup['status'])
         self.assertEqual(backup_desc_1, backup['description'])
 
+        restore_1 = self.user_cloud.restore_volume_backup(
+            name_or_id=backup['id'],
+            volume_name=restore_volume_name_1,
+            wait=True
+        )
+        self.assertEqual(restore_volume_name_1, restore_1['volume_name'])
+
+        restore_volume_2 = self.user_cloud.create_volume(
+            display_name=self.getUniqueString(), size=1)
+        restore_2 = self.user_cloud.restore_volume_backup(
+            name_or_id=backup['id'],
+            volume_id=restore_volume_2['id'],
+            wait=True
+        )
+        self.assertEqual(restore_volume_2['id'], restore_2['volume_id'])
+
         self.user_cloud.delete_volume_backup(backup['id'], wait=True)
+        self.user_cloud.delete_volume(restore_1['volume_id'], wait=True)
+        self.user_cloud.delete_volume(restore_2['volume_id'], wait=True)
         self.assertIsNone(self.user_cloud.get_volume_backup(backup['id']))
 
     def test_list_volume_backups(self):

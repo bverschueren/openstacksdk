@@ -768,6 +768,66 @@ class BlockStorageCloudMixin(_normalize.Normalizer):
 
         return True
 
+    def restore_volume_backup(self, name_or_id=None, volume_name=None,
+                              volume_id=None, wait=False, timeout=None):
+        """Restore from a volume backup.
+
+        :param name_or_id: Name or unique ID of the volume backup.
+        :param volume_name: Name of the new volume to be created and restored
+                            to.
+        :param volume_id: ID of an existing volume to restore to.
+        :param wait: If true, waits for volume backup to be restored.
+        :param timeout: Seconds to wait for volume backup restore. None is
+                        forever.
+
+        :returns: Munch object with the restore properties
+
+        :raises: OpenStackCloudTimeout if wait time exceeded.
+        :raises: OpenStackCloudException on operation error.
+        """
+
+        volume_backup = self.get_volume_backup(name_or_id)
+
+        if not volume_backup:
+            return False
+
+        payload = {}
+
+        if volume_name:
+            payload['name'] = volume_name
+
+        if volume_id:
+            payload['volume_id'] = volume_id
+
+        resp = self.block_storage.post(
+            '/backups/{backup_id}/restore'.format(
+                backup_id=volume_backup['id']),
+            json=dict(restore=payload))
+
+        data = proxy._json_response(
+            resp,
+            error_message="Error restoring backup "
+                          "{backup_id}".format(
+                              backup_id=volume_backup['id']))
+        restore = self._get_and_munchify('restore', data)
+
+        if wait:
+            volume_id = restore['volume_id']
+            msg = ("Timeout waiting for the restored volume {} to be "
+                   "available".format(volume_id))
+            for _ in utils.iterate_timeout(timeout, msg):
+                volume = self.get_volume(volume_id)
+
+                if volume['status'] == 'available':
+                    break
+
+                if volume['status'] == 'error_restoring':
+                    raise exc.OpenStackCloudException(
+                        "Error restoring backup {id}".format(
+                            id=restore['backup_id']))
+
+        return restore
+
     def delete_volume_snapshot(self, name_or_id=None, wait=False,
                                timeout=None):
         """Delete a volume snapshot.
