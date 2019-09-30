@@ -231,10 +231,6 @@ class Proxy(_base_proxy.BaseBlockStorageProxy):
 
         :returns: A generator of backup objects.
         """
-        if not self._connection.has_service('object-store'):
-            raise exceptions.SDKException(
-                'Object-store service is required for block-store backups'
-            )
         base_path = '/backups/detail' if details else None
         return self._list(_backup.Backup, base_path=base_path, **query)
 
@@ -248,10 +244,6 @@ class Proxy(_base_proxy.BaseBlockStorageProxy):
         :returns: Backup instance
         :rtype: :class:`~openstack.block_storage.v2.backup.Backup`
         """
-        if not self._connection.has_service('object-store'):
-            raise exceptions.SDKException(
-                'Object-store service is required for block-store backups'
-            )
         return self._get(_backup.Backup, backup)
 
     def create_backup(self, **attrs):
@@ -264,10 +256,6 @@ class Proxy(_base_proxy.BaseBlockStorageProxy):
         :returns: The results of Backup creation
         :rtype: :class:`~openstack.block_storage.v2.backup.Backup`
         """
-        if not self._connection.has_service('object-store'):
-            raise exceptions.SDKException(
-                'Object-store service is required for block-store backups'
-            )
         return self._create(_backup.Backup, **attrs)
 
     def delete_backup(self, backup, ignore_missing=True):
@@ -283,10 +271,6 @@ class Proxy(_base_proxy.BaseBlockStorageProxy):
 
         :returns: ``None``
         """
-        if not self._connection.has_service('object-store'):
-            raise exceptions.SDKException(
-                'Object-store service is required for block-store backups'
-            )
         self._delete(_backup.Backup, backup,
                      ignore_missing=ignore_missing)
 
@@ -301,10 +285,6 @@ class Proxy(_base_proxy.BaseBlockStorageProxy):
         :returns: Updated backup instance
         :rtype: :class:`~openstack.block_storage.v2.backup.Backup`
         """
-        if not self._connection.has_service('object-store'):
-            raise exceptions.SDKException(
-                'Object-store service is required for block-store backups'
-            )
         backup = self._get_resource(_backup.Backup, backup)
         return backup.restore(self, volume_id=volume_id, name=name)
 
