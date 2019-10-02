@@ -72,6 +72,8 @@ class Backup(resource.Resource):
     #: The UUID of the owning project.
     #: New in version 3.18
     project_id = resource.Body('os-backup-project-attr:project_id')
+    #: Properties, if any, that are associated with the backup.
+    properties = resource.Body('properties')
     #: The size of the volume, in gibibytes (GiB).
     size = resource.Body("size", type=int)
     #: The UUID of the source volume snapshot.
@@ -96,6 +98,7 @@ class Backup(resource.Resource):
         """
         url = utils.urljoin(self.base_path, self.id, "restore")
         body = {'restore': {}}
+
         if volume_id:
             body['restore']['volume_id'] = volume_id
         if name:
@@ -105,7 +108,10 @@ class Backup(resource.Resource):
                                           ' must be specified.')
         response = session.post(url,
                                 json=body)
-        self._translate_response(response, has_body=False)
+
+        # retrieve details of the restored backup as properties
+        self._store_unknown_attrs_as_properties = True
+        self._translate_response(response, has_body=True)
         return self
 
 
