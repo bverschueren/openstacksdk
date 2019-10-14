@@ -132,10 +132,12 @@ class NetworkCloudMixin(_normalize.Normalizer):
         data = self.network.get("/networks.json", params=filters)
         return self._get_and_munchify('networks', data)
 
-    def list_routers(self, filters=None):
+    def list_routers(self, filters=None, bare=False):
         """List all available routers.
 
         :param filters: (optional) dict of filter conditions to push down
+        :param bare: Whether to skip adding any additional information to the
+                     router record.
         :returns: A list of router ``munch.Munch``.
 
         """
@@ -149,7 +151,8 @@ class NetworkCloudMixin(_normalize.Normalizer):
         data = proxy._json_response(
             resp,
             error_message="Error fetching router list")
-        return self._get_and_munchify('routers', data)
+        routers = self._get_and_munchify('routers', data)
+        return [self._expand_router(router, bare) for router in routers]
 
     def list_subnets(self, filters=None):
         """List all available subnets.
@@ -356,7 +359,23 @@ class NetworkCloudMixin(_normalize.Normalizer):
 
         return network
 
-    def get_router(self, name_or_id, filters=None):
+    def _expand_router(self, router, bare):
+        if bare or not router:
+            return router
+        else:
+            interfaces_info = []
+            for interface in self.list_router_interfaces(router):
+                for ip_spec in interface.fixed_ips:
+                        int_info = {
+                            'port_id': interface.id,
+                            'ip_address': ip_spec.get('ip_address'),
+                            'subnet_id': ip_spec.get('subnet_id')
+                        }
+                        interfaces_info.append(int_info)
+            router['interfaces_info'] = interfaces_info
+            return router
+
+    def get_router(self, name_or_id, filters=None, bare=False):
         """Get a router by name or ID.
 
         :param name_or_id: Name or ID of the router.
@@ -374,12 +393,15 @@ class NetworkCloudMixin(_normalize.Normalizer):
             OR
             A string containing a jmespath expression for further filtering.
             Example:: "[?last_name==`Smith`] | [?other.gender]==`Female`]"
+        :param bare: Whether to skip adding any additional information to the
+                     router record.
 
         :returns: A router ``munch.Munch`` or None if no matching router is
                   found.
 
         """
-        return _utils._get_entity(self, 'router', name_or_id, filters)
+        router = _utils._get_entity(self, 'router', name_or_id, filters)
+        return self._expand_router(router, bare)
 
     def get_subnet(self, name_or_id, filters=None):
         """Get a subnet by name or ID.
