@@ -1952,10 +1952,11 @@ class NetworkCloudMixin(_normalize.Normalizer):
                 return router_gateways
         return ports
 
+    @_utils.valid_kwargs('ha')
     def create_router(self, name=None, admin_state_up=True,
                       ext_gateway_net_id=None, enable_snat=None,
                       ext_fixed_ips=None, project_id=None,
-                      availability_zone_hints=None):
+                      availability_zone_hints=None, **kwargs):
         """Create a logical router.
 
         :param string name: The router name.
@@ -1979,9 +1980,9 @@ class NetworkCloudMixin(_normalize.Normalizer):
         :returns: The router object.
         :raises: OpenStackCloudException on operation error.
         """
-        router = {
+        router = dict({
             'admin_state_up': admin_state_up
-        }
+        }, **kwargs)
         if project_id is not None:
             router['tenant_id'] = project_id
         if name:
@@ -2000,15 +2001,21 @@ class NetworkCloudMixin(_normalize.Normalizer):
                     'router_availability_zone extension is not available on '
                     'target cloud')
             router['availability_zone_hints'] = availability_zone_hints
+        if kwargs.get('ha', False):
+            if not self._has_neutron_extension('l3-ha'):
+                raise exc.OpenStackCloudUnavailableExtension(
+                    'l3-ha extension is not available on '
+                    'target cloud')
 
         data = proxy._json_response(
             self.network.post("/routers.json", json={"router": router}),
             error_message="Error creating router {0}".format(name))
         return self._get_and_munchify('router', data)
 
+    @_utils.valid_kwargs('ha')
     def update_router(self, name_or_id, name=None, admin_state_up=None,
                       ext_gateway_net_id=None, enable_snat=None,
-                      ext_fixed_ips=None, routes=None):
+                      ext_fixed_ips=None, routes=None, **kwargs):
         """Update an existing logical router.
 
         :param string name_or_id: The name or UUID of the router to update.
@@ -2042,7 +2049,7 @@ class NetworkCloudMixin(_normalize.Normalizer):
         :returns: The router object.
         :raises: OpenStackCloudException on operation error.
         """
-        router = {}
+        router = dict(**kwargs)
         if name:
             router['name'] = name
         if admin_state_up is not None:
@@ -2059,6 +2066,12 @@ class NetworkCloudMixin(_normalize.Normalizer):
             else:
                 self.log.warning(
                     'extra routes extension is not available on target cloud')
+
+        if kwargs.get('ha', False):
+            if not self._has_neutron_extension('l3-ha'):
+                raise exc.OpenStackCloudUnavailableExtension(
+                    'l3-ha extension is not available on '
+                    'target cloud')
 
         if not router:
             self.log.debug("No router data to update")

@@ -74,9 +74,18 @@ class TestRouter(base.TestCase):
         "name": "Extra Routes"
     }
 
+    router_l3_ha_extension = {
+        "alias": "l3-ha",
+        "updated": "2015-01-01T10:00:00-00:00",
+        "description": "Adds HA capability to routers.",
+        "links": [],
+        "name": "HA Router extension"
+    }
+
     enabled_neutron_extensions = [
         router_availability_zone_extension,
-        router_extraroute_extension]
+        router_extraroute_extension,
+        router_l3_ha_extension]
 
     def test_get_router(self):
         self.register_uris([
@@ -219,6 +228,28 @@ class TestRouter(base.TestCase):
                 name=self.router_name, admin_state_up=True,
                 availability_zone_hints=azh_opts)
 
+    def test_create_ha_router(self):
+        """Create HA router"""
+        mock_router_rep = copy.copy(self.mock_router_rep)
+        mock_router_rep['ha'] = True
+        self.register_uris([
+            dict(method='GET',
+                 uri=self.get_mock_url(
+                     'network', 'public', append=['v2.0', 'extensions.json']),
+                 json={'extensions': self.enabled_neutron_extensions}),
+            dict(method='POST',
+                 uri=self.get_mock_url(
+                     'network', 'public', append=['v2.0', 'routers.json']),
+                 json={'router': mock_router_rep},
+                 validate=dict(
+                     json={'router': {
+                         'name': self.router_name,
+                         'admin_state_up': True, 'ha': True}}))
+        ])
+        self.cloud.create_router(
+            name=self.router_name, admin_state_up=True, ha=True)
+        self.assert_calls()
+
     def test_add_router_interface(self):
         self.register_uris([
             dict(method='PUT',
@@ -283,6 +314,33 @@ class TestRouter(base.TestCase):
         ])
         new_router = self.cloud.update_router(
             self.router_id, name=new_router_name, routes=new_routes)
+        self.assertDictEqual(expected_router_rep, new_router)
+        self.assert_calls()
+
+    def test_update_router_ha(self):
+        expected_router_rep = copy.copy(self.mock_router_rep)
+        expected_router_rep['ha'] = True
+
+        self.register_uris([
+            dict(method='GET',
+                 uri=self.get_mock_url(
+                     'network', 'public', append=['v2.0', 'extensions.json']),
+                 json={'extensions': self.enabled_neutron_extensions}),
+            dict(method='GET',
+                 uri=self.get_mock_url(
+                     'network', 'public', append=['v2.0', 'routers.json']),
+                 json={'routers': [self.mock_router_rep]}),
+            dict(method='PUT',
+                 uri=self.get_mock_url(
+                     'network', 'public',
+                     append=['v2.0', 'routers', '%s.json' % self.router_id]),
+                 json={'router': expected_router_rep},
+                 validate=dict(
+                     json={'router': {
+                         'ha': True}}))
+        ])
+        new_router = self.cloud.update_router(
+            self.router_id, ha=True)
         self.assertDictEqual(expected_router_rep, new_router)
         self.assert_calls()
 

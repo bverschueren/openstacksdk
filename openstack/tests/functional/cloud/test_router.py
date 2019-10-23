@@ -25,7 +25,7 @@ from openstack.tests.functional import base
 
 EXPECTED_TOPLEVEL_FIELDS = (
     'id', 'name', 'admin_state_up', 'external_gateway_info',
-    'tenant_id', 'routes', 'status'
+    'tenant_id', 'routes', 'status', 'ha'
 )
 
 EXPECTED_GW_INFO_FIELDS = ('network_id', 'enable_snat', 'external_fixed_ips')
@@ -137,6 +137,32 @@ class TestRouter(base.BaseFunctionalTest):
         self.assertEqual(proj_id, router['tenant_id'])
         self.assertEqual(net1['id'], ext_gw_info['network_id'])
         self.assertTrue(ext_gw_info['enable_snat'])
+
+    def test_create_router_ha(self):
+        net1_name = self.network_prefix + '_net1'
+        net1 = self.operator_cloud.create_network(
+            name=net1_name, external=True)
+
+        router_name = self.router_prefix + '_create_ha'
+        router = self.operator_cloud.create_router(
+            name=router_name,
+            admin_state_up=True,
+            ext_gateway_net_id=net1['id'],
+            ha=True,
+        )
+
+        for field in EXPECTED_TOPLEVEL_FIELDS:
+            self.assertIn(field, router)
+
+        ext_gw_info = router['external_gateway_info']
+        for field in EXPECTED_GW_INFO_FIELDS:
+            self.assertIn(field, ext_gw_info)
+
+        self.assertEqual(router_name, router['name'])
+        self.assertEqual('ACTIVE', router['status'])
+        self.assertEqual(net1['id'], ext_gw_info['network_id'])
+        self.assertTrue(ext_gw_info['enable_snat'])
+        self.assertTrue(router['ha'])
 
     def _create_and_verify_advanced_router(self,
                                            external_cidr,
@@ -363,3 +389,23 @@ class TestRouter(base.BaseFunctionalTest):
         self.assertEqual(router['status'], updated['status'])
         self.assertEqual(router['name'], updated['name'])
         self.assertEqual(router['admin_state_up'], updated['admin_state_up'])
+
+    def test_update_router_ha(self):
+        router = self._create_and_verify_advanced_router(
+            external_cidr=u'10.7.7.0/24')
+
+        updated = self.operator_cloud.update_router(
+            router['id'], ha=True)
+        self.assertIsNotNone(updated)
+
+        for field in EXPECTED_TOPLEVEL_FIELDS:
+            self.assertIn(field, updated)
+
+        self.assertEqual(True, updated['ha'])
+
+        # Validate nothing else changed
+        self.assertEqual(router['name'], updated['name'])
+        self.assertEqual(router['status'], updated['status'])
+        self.assertEqual(router['admin_state_up'], updated['admin_state_up'])
+        self.assertEqual(router['external_gateway_info'],
+                         updated['external_gateway_info'])
